@@ -1,0 +1,19 @@
+app:
+  token:
+    secret: 5mF9pmpj3pyveaVWdSqvSJml8JAqsR7S0mjOSrqi5LoPqeDqjh+JAxg9zfLu3dhv
+    issuer: http://localhost:8080
+
+spring:
+  application:
+    name: patyforboost
+  datasource:
+    url: jdbc:postgresql://localhost:5432/patyforboost
+    username: postgres
+    password: postgres
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog.yaml
