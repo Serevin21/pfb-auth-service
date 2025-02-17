@@ -2,10 +2,10 @@ package com.serevin.patyforboost.validator.pre.impl;
 
 import com.serevin.patyforboost.dto.token.TokenRequest;
 import com.serevin.patyforboost.entity.User;
+import com.serevin.patyforboost.exception.BadCredentialsException;
 import com.serevin.patyforboost.model.TokenHandlerType;
 import com.serevin.patyforboost.validator.pre.AbstractTokenPreValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 

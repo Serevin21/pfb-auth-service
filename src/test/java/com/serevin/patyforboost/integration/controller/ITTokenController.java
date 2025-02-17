@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //дописать тест для гугл
 
 @Transactional
-public class ITTokenController extends ITBase {
+public class   ITTokenController extends ITBase {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;

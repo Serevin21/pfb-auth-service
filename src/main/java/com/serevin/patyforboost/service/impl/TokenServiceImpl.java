@@ -63,7 +63,6 @@ public class TokenServiceImpl implements TokenService {
                 .ifPresent(tokenPreValidator -> tokenPreValidator.preValidate(user, tokenRequest));
 
         TokenResponse tokenResponse = jwtService.generateTokens(user);
-
         LocalDateTime dateTimeExpiryAt = convertMillisToLocalDateTime(tokenResponse.refreshToken().expiresAt());
 
         RefreshToken refreshToken = refreshTokenMapper.map(user, userAgent, tokenResponse.refreshToken().token(), dateTimeExpiryAt);
@@ -89,9 +88,11 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public void revokeRefreshToken(String email) {
         List<RefreshToken> tokens = refreshTokenService.findTokensByEmail(email);
+
         if (tokens.isEmpty()) {
             throw new InvalidRefreshTokenException("No refresh tokens found for the given email.");
         }
+
         tokens.forEach(refreshTokenService::deleteRefreshToken);
     }
 

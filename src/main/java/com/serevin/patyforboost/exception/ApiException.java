@@ -31,6 +31,15 @@ public abstract class ApiException extends RuntimeException {
         this.data = data;
     }
 
+
+    protected ApiException(String message, String logMessage, Map<String, Object> data) {
+        this.message = message;
+        this.logMessage = logMessage;
+        this.data = data;
+        code = null;
+        errorCode = null;
+    }
+
     public abstract String getCode();
     public abstract String getMessage();
     public abstract String getLogMessage();

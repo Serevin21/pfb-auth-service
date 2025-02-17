@@ -8,6 +8,7 @@ CREATE TABLE users
     email                                            VARCHAR NOT NULL,
     password                                         VARCHAR,
     enabled                                          BOOL NOT NULL DEFAULT true,
+    status                                           VARCHAR(255) NOT NULL DEFAULT 'UNVERIFIED',
     role                                             VARCHAR NOT NULL,
     activation_code                                  VARCHAR,
     activation_code_last_sent_at                     TIMESTAMP WITHOUT TIME ZONE,

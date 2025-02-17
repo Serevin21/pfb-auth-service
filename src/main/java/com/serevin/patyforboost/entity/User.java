@@ -1,6 +1,7 @@
 package com.serevin.patyforboost.entity;
 
 import com.serevin.patyforboost.enums.Role;
+import com.serevin.patyforboost.enums.UserStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -48,6 +49,10 @@ public class User {
 
     @Builder.Default
     private boolean enabled = true;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private UserStatus status = UserStatus.UNVERIFIED;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)

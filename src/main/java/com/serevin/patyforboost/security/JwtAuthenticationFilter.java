@@ -1,5 +1,7 @@
 package com.serevin.patyforboost.security;
 
+import com.serevin.patyforboost.controller.handler.ApiErrorHandler;
+import com.serevin.patyforboost.exception.BadCredentialsException;
 import com.serevin.patyforboost.service.JwtService;
 import com.serevin.patyforboost.service.impl.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
@@ -25,6 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsService;
+    private final ApiErrorHandler apiErrorHandler;
 
     private static final String BEARER_PREFIX = "Bearer ";
 
@@ -32,28 +35,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }
-
         String token = authHeader.substring(BEARER_PREFIX.length());
-
-        if (!jwtService.validateToken(token)) {
-            throw new JwtException("Invalid JWT token");
-        }
-
-        Claims claims = jwtService.getClaimsFromToken(token);
-        String email = claims.getSubject();
-
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            if (!jwtService.validateToken(token)) {
+                throw new BadCredentialsException("Invalid JWT token");
+            }
+            Claims claims = jwtService.getClaimsFromToken(token);
+            String email = claims.getSubject();
+            if (email != null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (Exception e) {
+                apiErrorHandler.handleException(e, response);
+                return;
         }
         filterChain.doFilter(request, response);
     }

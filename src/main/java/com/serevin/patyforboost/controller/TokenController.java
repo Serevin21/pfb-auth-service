@@ -41,7 +41,7 @@ public class TokenController {
         return ResponseEntity.ok(response);
     }
 
-    // @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping(ApiPaths.TOKEN_SIGN_OUT)
     public ResponseEntity<Void> signOut(Authentication authentication) {
 

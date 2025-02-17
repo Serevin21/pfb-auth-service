@@ -4,6 +4,17 @@ app:
     issuer: http://localhost:8080
 
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: pototsky.ilya212@gmail.com
+    password: iaej uwrn wmvq izgc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   application:
     name: patyforboost
   datasource:

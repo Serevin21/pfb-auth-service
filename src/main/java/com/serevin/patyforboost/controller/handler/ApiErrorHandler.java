@@ -17,7 +17,7 @@ import java.rmi.ServerException;
 @RestControllerAdvice
 @Slf4j
 @RequiredArgsConstructor
-public class ControllerErrorHandler {
+public class ApiErrorHandler {
 
     private final ObjectMapper objectMapper;
 
