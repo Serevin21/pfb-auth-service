@@ -12,13 +12,13 @@ CREATE TABLE users
     role                                             VARCHAR NOT NULL,
     activation_code                                  VARCHAR,
     activation_code_last_sent_at                     TIMESTAMP WITHOUT TIME ZONE,
-    activation_code_sent_times                       INTEGER,
-    invalid_activation_code_entered_times            INTEGER,
+    activation_code_sent_times                       INTEGER DEFAULT 0 NOT NULL,
+    invalid_activation_code_entered_times            INTEGER DEFAULT 0 NOT NULL,
     invalid_activation_code_entered_last_time_at     TIMESTAMP WITHOUT TIME ZONE,
     reset_password_code                              VARCHAR,
     reset_password_code_last_sent_at                 TIMESTAMP WITHOUT TIME ZONE,
-    reset_password_sent_times                        INTEGER,
-    invalid_reset_password_code_entered_times        INTEGER,
+    reset_password_sent_times                        INTEGER DEFAULT 0 NOT NULL,
+    invalid_reset_password_code_entered_times        INTEGER DEFAULT 0 NOT NULL,
     invalid_reset_password_code_entered_last_time_at TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );

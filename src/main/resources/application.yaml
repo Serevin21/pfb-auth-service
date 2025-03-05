@@ -2,13 +2,21 @@ app:
   token:
     secret: 5mF9pmpj3pyveaVWdSqvSJml8JAqsR7S0mjOSrqi5LoPqeDqjh+JAxg9zfLu3dhv
     issuer: http://localhost:8080
+  activation:
+    email:
+      maxActivationEmailAttempts: 3
+      maxFailedCodeEnteringAttempts: 3
+  reset:
+    password:
+      maxResetPasswordAttempts: 3
+      maxFailedCodeEnteringAttempts: 3
 
 spring:
   mail:
     host: smtp.gmail.com
     port: 587
     username: pototsky.ilya212@gmail.com
-    password: iaej uwrn wmvq izgc
+    password: zgfq npvw rmkv nuoa
     properties:
       mail:
         smtp:
