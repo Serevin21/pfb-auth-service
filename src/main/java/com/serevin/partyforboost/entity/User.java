@@ -93,4 +93,11 @@ public class User {
     @Column(name = "invalid_reset_password_code_entered_last_time_at")
     private LocalDateTime invalidResetPasswordCodeEnteredLastTimeAt;
 
+    @Column(name = "invalid_password_entered_times", nullable = false)
+    @Builder.Default
+    private Integer invalidPasswordEnteredTimes = 0;
+
+    @Column(name = "invalid_password_entered_last_time_at")
+    private LocalDateTime invalidPasswordEnteredLastTimeAt;
+
 }

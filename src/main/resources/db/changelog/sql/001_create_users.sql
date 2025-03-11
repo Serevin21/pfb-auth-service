@@ -20,6 +20,8 @@ CREATE TABLE users
     reset_password_sent_times                        INTEGER DEFAULT 0 NOT NULL,
     invalid_reset_password_code_entered_times        INTEGER DEFAULT 0 NOT NULL,
     invalid_reset_password_code_entered_last_time_at TIMESTAMP WITHOUT TIME ZONE,
+    invalid_password_entered_times                   INTEGER DEFAULT 0 NOT NULL,
+    invalid_password_entered_last_time_at            TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 

@@ -5,14 +5,14 @@ import com.serevin.partyforboost.dto.reset.password.ResetPasswordRequest;
 import com.serevin.partyforboost.dto.reset.password.ValidateCodeRequest;
 import com.serevin.partyforboost.entity.User;
 import com.serevin.partyforboost.event.EmailResetPasswordEvent;
+import com.serevin.partyforboost.exception.EntityNotFoundException;
 import com.serevin.partyforboost.exception.ExceededAttemptsException;
 import com.serevin.partyforboost.exception.InvalidResetPasswordCodeException;
 import com.serevin.partyforboost.gererator.CodeGenerator;
 import com.serevin.partyforboost.service.ResetPasswordService;
 import com.serevin.partyforboost.service.UserService;
-import jakarta.validation.ValidationException;
+import com.serevin.partyforboost.utils.ResetPasswordsProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,15 +29,10 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher publisher;
 
-    private int maxResetPasswordAttempts;
-    private int maxFailedCodeEnteringAttempts;
-
-
     @Transactional
     @Override
     public void resetPassword(ResetPasswordRequest request) {
         String email = request.email();
-
         User user = userService.getByEmail(email);
         validateResetPassword(user);
 
@@ -52,11 +47,13 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
     }
 
     private void validateResetPassword(User user) {
-        if (user.getResetPasswordSentTimes() >= maxResetPasswordAttempts) {
+        if (user.getResetPasswordSentTimes() >= ResetPasswordsProperties.MAX_RESET_PASSWORD_ATTEMPTS) {
 
             LocalDateTime resetPasswordCodeLastSentAt = user.getResetPasswordCodeLastSentAt();
-            if (resetPasswordCodeLastSentAt != null && resetPasswordCodeLastSentAt.plusMinutes(5L).isAfter(LocalDateTime.now())) {
-                throw new ExceededAttemptsException("You have exceeded reset password attempts.", resetPasswordCodeLastSentAt.plusMinutes(5L));
+            if (resetPasswordCodeLastSentAt != null && resetPasswordCodeLastSentAt
+                    .plusMinutes(ResetPasswordsProperties.RESET_PASSWORD_CODE_EXPIRATION_MINUTES).isAfter(LocalDateTime.now())) {
+                throw new ExceededAttemptsException("You have exceeded reset password attempts.", resetPasswordCodeLastSentAt
+                        .plusMinutes(ResetPasswordsProperties.RESET_PASSWORD_CODE_EXPIRATION_MINUTES));
             } else {
                 user.setResetPasswordSentTimes(0);
             }
@@ -109,27 +106,18 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
     private void validateChangePassword(User user) {
         int invalidResetPasswordCodeEnteredTimes = user.getInvalidResetPasswordCodeEnteredTimes() + 1;
 
-        if (invalidResetPasswordCodeEnteredTimes >= maxFailedCodeEnteringAttempts) {
+        if (invalidResetPasswordCodeEnteredTimes >= ResetPasswordsProperties.MAX_FAILED_CODE_ENTERING_ATTEMPTS) {
 
             LocalDateTime invalidResetPasswordCodeEnteredLastTimeAt = user.getInvalidResetPasswordCodeEnteredLastTimeAt();
             if (invalidResetPasswordCodeEnteredLastTimeAt != null &&
-                    invalidResetPasswordCodeEnteredLastTimeAt.plusMinutes(5L).isAfter(LocalDateTime.now())) {
+                    invalidResetPasswordCodeEnteredLastTimeAt.plusMinutes(ResetPasswordsProperties.FAILED_CODE_ENTERING_LOCK_DURATION_MINUTES)
+                            .isAfter(LocalDateTime.now())) {
                 throw new ExceededAttemptsException("You have exceeded reset password code entering attempts.",
-                        invalidResetPasswordCodeEnteredLastTimeAt.plusMinutes(5L));
+                        invalidResetPasswordCodeEnteredLastTimeAt.plusMinutes(ResetPasswordsProperties.FAILED_CODE_ENTERING_LOCK_DURATION_MINUTES));
             } else {
                 user.setInvalidResetPasswordCodeEnteredTimes(0);
             }
         }
-    }
-
-    @Value("${app.reset.password.maxResetPasswordAttempts}")
-    public void setMaxResetPasswordAttempts(int maxResetPasswordAttempts) {
-        this.maxResetPasswordAttempts = maxResetPasswordAttempts;
-    }
-
-    @Value("${app.reset.password.maxFailedCodeEnteringAttempts}")
-    public void setMaxFailedCodeEnteringAttempts(int maxFailedCodeEnteringAttempts) {
-        this.maxFailedCodeEnteringAttempts = maxFailedCodeEnteringAttempts;
     }
 
 }

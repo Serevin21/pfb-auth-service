@@ -14,15 +14,17 @@ import org.springframework.stereotype.Service;
 public class EmailServiceImpl implements EmailService {
 
     private String emailFrom;
-
     private final JavaMailSender javaMailSender;
+
+    @Value("${app.organization.name}")
+    private String organizationName;
 
     @Override
     public void sendConfirmationEmail(EmailActivationEvent event) {
         String emailTo = event.getEmail();
         sendEmail(
                 "Hey %s\nHere is your email confirmation code:\n%s".formatted(emailTo, event.getCode()),
-                "Serevin",
+                organizationName,
                 emailTo
         );
     }
@@ -32,7 +34,7 @@ public class EmailServiceImpl implements EmailService {
         String emailTo = event.getEmail();
         sendEmail(
                 "Hey %s\nHere is your reset password code:\n%s".formatted(emailTo, event.getCode()),
-                "Serevin",
+                organizationName,
                 emailTo
         );
     }

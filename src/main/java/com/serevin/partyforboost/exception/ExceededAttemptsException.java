@@ -1,6 +1,5 @@
 package com.serevin.partyforboost.exception;
 
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -45,6 +44,6 @@ public class ExceededAttemptsException extends ApiException {
     }
 
     public LocalDateTime getRetryAfter() {
-        return retryAfter;  // Optionally return the retryAfter value
+        return retryAfter;
     }
 }

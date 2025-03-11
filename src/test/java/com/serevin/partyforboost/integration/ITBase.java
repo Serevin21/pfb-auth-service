@@ -7,12 +7,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.RestTemplate;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -32,6 +34,8 @@ public class ITBase {
 
     @Autowired
     protected MockMvc mvc;
+    @Autowired
+    protected RestTemplate restTemplate;
     @Autowired
     protected UserService userService;
     @Autowired
@@ -77,30 +81,4 @@ public class ITBase {
         }
     }
 
-    protected String createEmailJson(String email) {
-        return String.format("""
-            {
-                "email": "%s"
-            }
-            """, email);
-    }
-
-    protected String createEmailAndCodeJson(String email, String code) {
-        return String.format("""
-                {
-                    "email": "%s",
-                    "code": "%s"
-                }
-                """, email, code);
-    }
-
-    protected String createEmailAndCodeAndPasswordJson(String email, String code, String password) {
-        return String.format("""
-                {
-                    "email": "%s",
-                    "code": "%s",
-                    "password": "%s"
-                }
-                """, email, code, password);
-    }
 }

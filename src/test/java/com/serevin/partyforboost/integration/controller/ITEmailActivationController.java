@@ -1,12 +1,14 @@
 package com.serevin.partyforboost.integration.controller;
 
+import com.serevin.partyforboost.dto.email.ActivationRequest;
+import com.serevin.partyforboost.dto.email.SendActivationEmailRequest;
 import com.serevin.partyforboost.entity.User;
 import com.serevin.partyforboost.enums.UserStatus;
 import com.serevin.partyforboost.integration.ITBase;
 import com.serevin.partyforboost.utils.ApiPaths;
+import com.serevin.partyforboost.utils.EmailActivationProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,15 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class ITEmailActivationController extends ITBase {
 
-    @Value("${app.activation.email.maxActivationEmailAttempts}")
-    private int maxActivationEmailAttempts;
-    @Value("${app.activation.email.maxFailedCodeEnteringAttempts}")
-    private int maxFailedCodeEnteringAttempts;
-
     private static final String EMAIL = "testEmail@example.com";
     private static final String USERNAME = "Serevin1337";
     private static final String PASSWORD = "tDSADASE1231231231";
-
 
     @BeforeEach
     public void setUp(){
@@ -37,7 +33,8 @@ public class ITEmailActivationController extends ITBase {
 
     @Test
     void sendEmail_whenValidRequest_thenReturns200() throws Exception {
-        String jsonRequest = createEmailJson(EMAIL);
+        SendActivationEmailRequest sendActivationEmailRequest = new SendActivationEmailRequest(EMAIL);
+        String jsonRequest = objectMapper.writeValueAsString(sendActivationEmailRequest);
 
         mvc.perform(post(ApiPaths.EMAIL_ACTIVATION_SEND_EMAIL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -52,7 +49,8 @@ public class ITEmailActivationController extends ITBase {
 
     @Test
     void sendEmail_whenInvalidEmail_thenReturns400() throws Exception {
-        String jsonRequest = createEmailJson("invalid-email");
+        SendActivationEmailRequest sendActivationEmailRequest = new SendActivationEmailRequest("invalid-email");
+        String jsonRequest = objectMapper.writeValueAsString(sendActivationEmailRequest);
 
         mvc.perform(post(ApiPaths.EMAIL_ACTIVATION_SEND_EMAIL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -64,9 +62,9 @@ public class ITEmailActivationController extends ITBase {
     void activate_whenValidRequest_thenReturns200() throws Exception {
         User byEmail = userService.getByEmail(EMAIL);
         String activationCode = byEmail.getActivationCode();
-        userService.save(byEmail);
 
-        String jsonRequest = createEmailAndCodeJson(EMAIL, activationCode);
+        ActivationRequest activationRequest = new ActivationRequest(EMAIL, activationCode);
+        String jsonRequest = objectMapper.writeValueAsString(activationRequest);
 
         mvc.perform(post(ApiPaths.EMAIL_ACTIVATION_ACTIVATE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -84,7 +82,9 @@ public class ITEmailActivationController extends ITBase {
         String activationCode = byEmail.getActivationCode();
         userService.save(byEmail);
 
-        String jsonRequest = createEmailAndCodeJson("invalid-email", activationCode);
+        ActivationRequest activationRequest = new ActivationRequest("invalid-email", activationCode);
+        String jsonRequest = objectMapper.writeValueAsString(activationRequest);
+
         mvc.perform(post(ApiPaths.EMAIL_ACTIVATION_ACTIVATE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
@@ -93,7 +93,8 @@ public class ITEmailActivationController extends ITBase {
 
     @Test
     void activate_whenCodeMissing_thenReturns400() throws Exception {
-        String jsonRequest = createEmailAndCodeJson(EMAIL, "");
+        ActivationRequest activationRequest = new ActivationRequest(EMAIL, "");
+        String jsonRequest = objectMapper.writeValueAsString(activationRequest);
 
         mvc.perform(post(ApiPaths.EMAIL_ACTIVATION_ACTIVATE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -103,7 +104,8 @@ public class ITEmailActivationController extends ITBase {
 
     @Test
     void activate_whenInvalidCode_thenReturns400() throws Exception {
-        String jsonRequest = createEmailAndCodeJson(EMAIL, "111111111");
+        ActivationRequest activationRequest = new ActivationRequest(EMAIL, "111111111");
+        String jsonRequest = objectMapper.writeValueAsString(activationRequest);
 
         mvc.perform(post(ApiPaths.EMAIL_ACTIVATION_ACTIVATE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -114,10 +116,12 @@ public class ITEmailActivationController extends ITBase {
     @Test
     void sendEmail_whenExceededAttempts_thenReturns429() throws Exception {
         User byEmail = userService.getByEmail(EMAIL);
-        byEmail.setActivationCodeSentTimes(maxFailedCodeEnteringAttempts);
+        byEmail.setActivationCodeSentTimes(EmailActivationProperties.MAX_FAILED_CODE_ENTERING_ATTEMPTS);
         userService.save(byEmail);
 
-        String jsonRequest = createEmailJson(EMAIL);
+        SendActivationEmailRequest sendActivationEmailRequest = new SendActivationEmailRequest(EMAIL);
+        String jsonRequest = objectMapper.writeValueAsString(sendActivationEmailRequest);
+
         mvc.perform(post(ApiPaths.EMAIL_ACTIVATION_SEND_EMAIL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
@@ -127,12 +131,13 @@ public class ITEmailActivationController extends ITBase {
     @Test
     void activateEmail_whenExceededAttempts_thenReturns429() throws Exception {
         User byEmail = userService.getByEmail(EMAIL);
-        byEmail.setInvalidActivationCodeEnteredTimes(maxActivationEmailAttempts);
+        byEmail.setInvalidActivationCodeEnteredTimes(EmailActivationProperties.MAX_ACTIVATION_EMAIL_ATTEMPTS);
         byEmail.setInvalidActivationCodeEnteredLastTimeAt(LocalDateTime.now());
         String activationCode = byEmail.getActivationCode();
         userService.save(byEmail);
 
-        String jsonRequest = createEmailAndCodeJson(EMAIL, activationCode);
+        ActivationRequest activationRequest = new ActivationRequest(EMAIL, activationCode);
+        String jsonRequest = objectMapper.writeValueAsString(activationRequest);
 
         mvc.perform(post(ApiPaths.EMAIL_ACTIVATION_ACTIVATE)
                         .contentType(MediaType.APPLICATION_JSON)

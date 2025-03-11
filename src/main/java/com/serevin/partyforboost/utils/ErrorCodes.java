@@ -13,5 +13,5 @@ public class ErrorCodes {
     public static final String INVALID_ACTIVATION_CODE_ERROR = "invalidActivationCode";
     public static final String ENTITY_NOT_FOUND_ERROR = "entityNotFound";
     public static final String INVALID_RESET_PASSWORD_CODE_ERROR = "invalidResetPasswordCodeException";
-
+    public static final String INVALID_PASSWORD_OR_EMAIL_ERROR = "invalidPasswordOrEmailException";
 }

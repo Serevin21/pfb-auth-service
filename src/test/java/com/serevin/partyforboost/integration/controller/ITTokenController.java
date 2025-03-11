@@ -3,10 +3,12 @@ package com.serevin.partyforboost.integration.controller;
 import com.jayway.jsonpath.JsonPath;
 import com.serevin.partyforboost.dto.token.RefreshTokenRequest;
 import com.serevin.partyforboost.entity.RefreshToken;
+import com.serevin.partyforboost.entity.User;
 import com.serevin.partyforboost.integration.ITBase;
 import com.serevin.partyforboost.model.TokenHandlerType;
 import com.serevin.partyforboost.repository.RefreshTokenRepository;
 import com.serevin.partyforboost.utils.ApiPaths;
+import com.serevin.partyforboost.utils.LoginAttemptProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//дописать тест для гугл
 
 @Transactional
 public class   ITTokenController extends ITBase {
@@ -176,8 +177,24 @@ public class   ITTokenController extends ITBase {
     }
 
     @Test
-    void generateToken_whenGoogleAuth_thenReturnToken() throws Exception {
+    void generateToken_whenExceededAttempts_thenReturn429() throws Exception {
+        User byEmail = userService.getByEmail(EMAIL);
+        byEmail.setInvalidPasswordEnteredTimes(LoginAttemptProperties.MAX_FAILED_ENTERING_ATTEMPTS);
+        byEmail.setInvalidPasswordEnteredLastTimeAt(LocalDateTime.now().minusMinutes(LoginAttemptProperties.LOCK_TIME_IN_MINUTES - 2));
+        userService.save(byEmail);
 
+        String jsonRequest = String.format("""
+        {
+            "handler": "%s",
+            "email": "%s",
+            "password": "%s"
+        }
+        """,TokenHandlerType.CREDENTIALS.name(), EMAIL, PASSWORD);
+
+        mvc.perform(post(ApiPaths.TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
+                .andExpect(status().isTooManyRequests());
     }
 
     @Test

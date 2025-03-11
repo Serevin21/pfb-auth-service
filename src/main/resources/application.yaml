@@ -2,14 +2,8 @@ app:
   token:
     secret: 5mF9pmpj3pyveaVWdSqvSJml8JAqsR7S0mjOSrqi5LoPqeDqjh+JAxg9zfLu3dhv
     issuer: http://localhost:8080
-  activation:
-    email:
-      maxActivationEmailAttempts: 3
-      maxFailedCodeEnteringAttempts: 3
-  reset:
-    password:
-      maxResetPasswordAttempts: 3
-      maxFailedCodeEnteringAttempts: 3
+  organization:
+    name: Your Organization Name
 
 spring:
   mail:

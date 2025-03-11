@@ -15,4 +15,5 @@ class TestcontainersConfiguration {
         return new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
     }
 
+
 }
