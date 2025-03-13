@@ -20,13 +20,13 @@ Open `application.yml` and set the following properties:
 ```yaml
 app:
   token:
-    secret: YOUR_SECRET_KEY
+    secret: 
 
 spring:
   datasource:
-    url: YOUR_DATABASE_URL
-    username: YOUR_DATABASE_USERNAME
-    password: YOUR_DATABASE_PASSWORD
+    url: 
+    username: 
+    password: 
   liquibase:
     change-log:
     
