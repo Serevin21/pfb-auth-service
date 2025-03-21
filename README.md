@@ -29,7 +29,6 @@ spring:
     password: 
   liquibase:
     change-log:
-    
 ```
 
 ## Build
