@@ -5,7 +5,6 @@ import com.serevin.partyforboost.dto.reset.password.ResetPasswordRequest;
 import com.serevin.partyforboost.dto.reset.password.ValidateCodeRequest;
 import com.serevin.partyforboost.entity.User;
 import com.serevin.partyforboost.event.EmailResetPasswordEvent;
-import com.serevin.partyforboost.exception.EntityNotFoundException;
 import com.serevin.partyforboost.exception.ExceededAttemptsException;
 import com.serevin.partyforboost.exception.InvalidResetPasswordCodeException;
 import com.serevin.partyforboost.gererator.CodeGenerator;

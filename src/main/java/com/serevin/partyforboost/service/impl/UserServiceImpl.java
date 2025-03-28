@@ -16,7 +16,6 @@ public class UserServiceImpl implements UserService {
 
     private final UsersRepository usersRepository;
 
-
     @Transactional(readOnly = true)
     @Override
     public User getByEmail(String email) {
